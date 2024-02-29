@@ -28,7 +28,7 @@ public class RotateBoard : MonoBehaviour
                 Vector2 difference = touchPosition - previousTouchPosition;
 
                 // Dönüþ hýzýný hesapla
-                Vector3 deltaRotation = new Vector3(difference.y, -difference.x, 0) * 0.1f;
+                Vector3 deltaRotation = new Vector3(difference.y, -difference.x, 0) * 0.2f;
                 rotationVelocity = deltaRotation;
 
                 // Anlýk dönüþ uygula
@@ -49,7 +49,7 @@ public class RotateBoard : MonoBehaviour
             if (!isDragging && rotationVelocity.magnitude > 0.01f)
             {
                 transform.Rotate(rotationVelocity, Space.World);
-                rotationVelocity *= 0.95f; // Momentumu yavaþça azalt
+                rotationVelocity *= 0.99f; // Momentumu yavaþça azalt
             }
             else if (!isDragging)
             {
