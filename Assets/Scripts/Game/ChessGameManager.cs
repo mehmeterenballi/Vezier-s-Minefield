@@ -13,15 +13,37 @@ public class ChessGameManager : MonoBehaviour
     private float squareSize = 41.8f;
 
     // Define the chessboard dimensions
-    private int rows = 8;
-    private int columns = 8;
+    private readonly int rows = 8;
+    private readonly int columns = 8;
 
     // Array to store logical representation of the chessboard
     private GameObject[,] chessboardSquares;
 
+    private BoxCollider2D chessboardCollider;
+    
+    Vector3 bottomLeft;
+    Vector3 topRight;
+
     void Start()
     {
         mainCamera = Camera.main;
+
+        chessboardCollider = GetComponent<BoxCollider2D>();
+
+        if (chessboardCollider != null)
+        {
+            // Calculate the world coordinates of the corners
+            bottomLeft = transform.TransformPoint(chessboardCollider.offset - chessboardCollider.size / 2f);
+            topRight = transform.TransformPoint(chessboardCollider.offset + chessboardCollider.size / 2f);
+
+            // Log the results
+            Debug.Log("Bottom-left corner: " + bottomLeft);
+            Debug.Log("Top-right corner: " + topRight);
+        }
+        else
+        {
+            Debug.LogError("BoxCollider2D not found!");
+        }
 
         // Initialize the chessboardSquares array
         InitializeChessboard();
@@ -83,17 +105,17 @@ public class ChessGameManager : MonoBehaviour
         }
     }
 
-    void OnChessSquareClicked(int row, int col)
+    void OnChessSquareClicked(int col, int row)
     {
         // Get the clicked chessboard square position
-        Vector3 clickedPosition = GetChessSquareCenter(row, col);
+        Vector3 clickedPosition = GetChessSquareCenter(col, row);
 
         // Instantiate the queen prefab at the clicked position
         GameObject queen = Instantiate(queenPrefab, clickedPosition, Quaternion.identity);
         queen.transform.SetParent(canvas.transform, false);
     }
 
-    Vector3 GetChessSquareCenter(int row, int col)
+    Vector3 GetChessSquareCenter(int col, int row)
     {
         // Calculate the position with an offset
         //float offsetX = 30f;
@@ -107,20 +129,20 @@ public class ChessGameManager : MonoBehaviour
     int[] GetChessboardIndices(Vector2 clickedPosition)
     {
         // Calculate the logical indices of the clicked chessboard square
-        int row = Mathf.FloorToInt(clickedPosition.y / squareSize);
-        int col = Mathf.FloorToInt(clickedPosition.x / squareSize);
+        int row = Mathf.FloorToInt(clickedPosition.y);
+        int col = Mathf.FloorToInt(clickedPosition.x);
 
         Debug.Log("clickedPosition.y: " + clickedPosition.y + ", clickedPosition.x: " + clickedPosition.x);
-        Debug.Log("clickedPosition.y / squareSize: " + clickedPosition.y / squareSize + ", clickedPosition.x / squareSize: " + clickedPosition.x / squareSize);
+        //Debug.Log("clickedPosition.y / squareSize: " + clickedPosition.y / squareSize + ", clickedPosition.x / squareSize: " + clickedPosition.x / squareSize);
         Debug.Log("Row before clamp: " + row + ", col before clamp: " + col);
 
         // Ensure the indices are within the chessboard boundaries
-        row = Mathf.Clamp(row, 0, rows - 1);
-        col = Mathf.Clamp(col, 0, columns - 1);
+        //row = Mathf.Clamp(row, 0, rows - 1);
+        //col = Mathf.Clamp(col, 0, columns - 1);
 
-        Debug.Log("Row after clamp: " + row + ", col after clamp: " + col);
+        //Debug.Log("Row after clamp: " + row + ", col after clamp: " + col);
 
-        int[] indices = { row, col };
+        int[] indices = { col, row };
         return indices;
     }
 
