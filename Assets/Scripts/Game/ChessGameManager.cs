@@ -1,6 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+//using System.Diagnostics;
+using System.Linq;
 using UnityEngine;
+using static UnityEngine.Rendering.DebugUI.Table;
 
 public class ChessGameManager : MonoBehaviour
 {
@@ -10,7 +14,7 @@ public class ChessGameManager : MonoBehaviour
     public GameObject canvas;
 
     // Define the size of each chessboard square
-    private float squareSize = 41.8f;
+    private readonly float squareSize = 41.8f;
 
     // Define the chessboard dimensions
     private readonly int rows = 8;
@@ -20,21 +24,28 @@ public class ChessGameManager : MonoBehaviour
     private GameObject[,] chessboardSquares;
 
     private BoxCollider2D chessboardCollider;
-    
+
     Vector3 bottomLeft;
     Vector3 topRight;
+
+    public GameObject ChessBoard;
+
+    float boardWidth;
+    float boardHeight;
 
     void Start()
     {
         mainCamera = Camera.main;
 
-        chessboardCollider = GetComponent<BoxCollider2D>();
 
-        if (chessboardCollider != null)
+        if (ChessBoard.TryGetComponent<BoxCollider2D>(out chessboardCollider))
         {
             // Calculate the world coordinates of the corners
             bottomLeft = transform.TransformPoint(chessboardCollider.offset - chessboardCollider.size / 2f);
             topRight = transform.TransformPoint(chessboardCollider.offset + chessboardCollider.size / 2f);
+
+            boardWidth = topRight.x - bottomLeft.x;
+            boardHeight = topRight.y - bottomLeft.y;
 
             // Log the results
             Debug.Log("Bottom-left corner: " + bottomLeft);
@@ -46,7 +57,7 @@ public class ChessGameManager : MonoBehaviour
         }
 
         // Initialize the chessboardSquares array
-        InitializeChessboard();
+        InitializeChessboardSquares();
     }
 
     void Update()
@@ -62,22 +73,37 @@ public class ChessGameManager : MonoBehaviour
                 Ray ray = mainCamera.ScreenPointToRay(touch.position);
                 RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);
 
-                // Perform the raycast
-                if (hit.collider != null && hit.collider.CompareTag("Chessboard"))
+                if (hit.collider != null)
                 {
-                    // Get the logical indices of the clicked chessboard square
-                    int[] indices = GetChessboardIndices(hit.point);
+                    Debug.Log(hit.collider.gameObject.name);
+                    if (hit.collider.TryGetComponent<ChessSquare>(out var chessSquareComponent))
+                    {
+                        //int hitRow = chessSquareComponent.row;
+                        //int hitCol = chessSquareComponent.col;
 
-                    // Call the function to handle the click
-                    OnChessSquareClicked(indices[0], indices[1]);
+                        //Vector2 spawnPos = chessboardSquares[hitRow, hitCol].transform.position;
+                        //Debug.Log("Row: " + hitRow + ", Col: " + hitCol);
+                        //Debug.Log("spawnPos.x: " + spawnPos.x + ", spawnPos.y: " + spawnPos.y);
+                        GameObject queen = Instantiate(queenPrefab, chessSquareComponent.gameObject.transform);
+                        queen.transform.SetParent(canvas.transform, false);
+                        queen.transform.SetParent(chessSquareComponent.gameObject.transform);
+                        queen.transform.localPosition = Vector3.zero;   
+
+                    }
+                    else
+                    {
+                        Debug.Log("chessSquareComponent not found!");
+                    }
                 }
             }
         }
     }
 
-    void InitializeChessboard()
+    private void InitializeChessboardSquares()
     {
         // Initialize the chessboardSquares array
+        //chessboardSquares = new GameObject[rows, columns];
+
         chessboardSquares = new GameObject[rows, columns];
 
         // Populate the array with logical representations of the chessboard squares
@@ -91,59 +117,102 @@ public class ChessGameManager : MonoBehaviour
                 // Create a logical representation of the chessboard square
                 chessboardSquares[row, col] = new GameObject("ChessboardSquare_" + row + "_" + col);
                 chessboardSquares[row, col].transform.position = new Vector3(xPosition, yPosition, 0f);
+                //chessboardSquares[row, col].tag = "ChessboardSquare_" + row + "_" + col;
                 chessboardSquares[row, col].AddComponent<BoxCollider2D>().isTrigger = true;
-                chessboardSquares[row, col].tag = "ChessboardSquare";
-
                 // Set the Canvas as the parent of the chessboard square
                 chessboardSquares[row, col].transform.SetParent(canvas.transform, false);
 
-                // Set the scale of each chessboard square (adjust the multiplier as needed)
+                // Set the scale of each chessboard tile (adjust the multiplier as needed)
                 float scaleMultiplier = 42f;
                 chessboardSquares[row, col].transform.localScale = new Vector3(scaleMultiplier, scaleMultiplier, 1f);
 
+                ChessSquare chessSquareComponent = chessboardSquares[row, col].AddComponent<ChessSquare>();
+                chessSquareComponent.row = row;
+                chessSquareComponent.col = col;
             }
         }
     }
 
-    void OnChessSquareClicked(int col, int row)
+    void OnChessSquareClicked(Vector2 queenSpawnPos)
     {
         // Get the clicked chessboard square position
-        Vector3 clickedPosition = GetChessSquareCenter(col, row);
+        //Vector3 clickedSquarePosition = GetChessSquareCenter(xPos, yPos);
 
         // Instantiate the queen prefab at the clicked position
-        GameObject queen = Instantiate(queenPrefab, clickedPosition, Quaternion.identity);
+        GameObject queen = Instantiate(queenPrefab, new(queenSpawnPos.x, queenSpawnPos.y, -2), Quaternion.identity);
         queen.transform.SetParent(canvas.transform, false);
     }
 
-    Vector3 GetChessSquareCenter(int col, int row)
+    //Vector3 GetChessSquareCenter(float xPos, float yPos)
+    //{
+    //    // Calculate the position with an offset
+    //    //float offsetX = 30f;
+    //    //float offsetY = 86f;
+
+    //    Vector3 position = new(xPos * squareSize - squareSize / 2, yPos * squareSize - squareSize / 2, -2);
+
+    //    return position;
+    //}
+
+    Vector2 FindClosestCenter(Vector2 target, Vector2[,] centers)
     {
-        // Calculate the position with an offset
-        //float offsetX = 30f;
-        //float offsetY = 86f;
+        Vector2 closestCenter = centers[0, 0];
+        float minDistance = Vector2.Distance(target, closestCenter);
 
-        Vector3 position = new Vector3(col * squareSize - squareSize / 2, row * squareSize - squareSize / 2, -2);
+        for (int i = 0; i < centers.GetLength(0); i++)
+        {
+            for (int j = 0; j < centers.GetLength(1); j++)
+            {
+                Vector2 center = centers[i, j];
+                float distance = Vector2.Distance(target, center);
 
-        return position;
+                if (distance < minDistance)
+                {
+                    minDistance = distance;
+                    closestCenter = center;
+                }
+            }
+        }
+
+        return closestCenter;
     }
 
-    int[] GetChessboardIndices(Vector2 clickedPosition)
+    Vector2 QueenSpawnPos(Vector2 clickedPosition)
     {
         // Calculate the logical indices of the clicked chessboard square
-        int row = Mathf.FloorToInt(clickedPosition.y);
-        int col = Mathf.FloorToInt(clickedPosition.x);
+        //int row = Mathf.FloorToInt(clickedPosition.y);
+        //int col = Mathf.FloorToInt(clickedPosition.x);
 
-        Debug.Log("clickedPosition.y: " + clickedPosition.y + ", clickedPosition.x: " + clickedPosition.x);
-        //Debug.Log("clickedPosition.y / squareSize: " + clickedPosition.y / squareSize + ", clickedPosition.x / squareSize: " + clickedPosition.x / squareSize);
-        Debug.Log("Row before clamp: " + row + ", col before clamp: " + col);
+        float squareBorderWidth = boardWidth / 8;
+        float squareBorderHeight = boardHeight / 8;
 
-        // Ensure the indices are within the chessboard boundaries
-        //row = Mathf.Clamp(row, 0, rows - 1);
-        //col = Mathf.Clamp(col, 0, columns - 1);
+        float firstXCenter = bottomLeft.x + squareBorderWidth / 2;
+        float firstYCenter = bottomLeft.y + squareBorderHeight / 2;
 
-        //Debug.Log("Row after clamp: " + row + ", col after clamp: " + col);
+        float[] squareXCenterPoints = new float[8];
+        float[] squareYCenterPoints = new float[8];
 
-        int[] indices = { col, row };
-        return indices;
+        for (int k = 0; k < 8; k++)
+        {
+            squareXCenterPoints[k] = firstXCenter + squareBorderWidth * k;
+            squareYCenterPoints[k] = firstYCenter + squareBorderHeight * k;
+        }
+
+        Vector2[,] allCenterPoints = new Vector2[8, 8];
+
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                allCenterPoints[i, j] = new Vector2(squareXCenterPoints[i], squareYCenterPoints[j]);
+                Debug.Log(allCenterPoints[i, j]);
+            }
+        }
+
+        // En yakýn merkezi bulma
+        Vector2 closestCenter = FindClosestCenter(clickedPosition, allCenterPoints);
+
+        //float[] indices = { col, row };
+        return closestCenter;
     }
-
 }

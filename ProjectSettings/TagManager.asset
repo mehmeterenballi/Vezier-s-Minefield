@@ -6,6 +6,17 @@ TagManager:
   tags:
   - Chessboard
   - ChessboardSquare
+  - ChessboardSquare_0_0
+  - ChessboardSquare_0_1
+  - ChessboardSquare_0_2
+  - ChessboardSquare_0_3
+  - ChessboardSquare_0_4
+  - ChessboardSquare_0_5
+  - ChessboardSquare_0_6
+  - ChessboardSquare_0_7
+  - ChessboardSquare_1_0
+  - ChessboardSquare_1_1
+  - ChessboardSquare_1_2
   layers:
   - Default
   - TransparentFX
