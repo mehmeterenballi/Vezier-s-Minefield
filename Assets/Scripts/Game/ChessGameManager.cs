@@ -1,12 +1,20 @@
 using System;
 using System.Collections.Generic;
+using System.Xml.Linq;
 using TMPro;
 using UnityEngine;
 using static UnityEngine.Rendering.DebugUI.Table;
 
 public class ChessGameManager : MonoBehaviour
 {
-    public GameObject solutions;
+
+    public bool isWinner = false;
+    public bool gameOver = false;
+
+    private bool isHighScore = false;
+
+    //public GameObject chessBoard;
+    public GameObject GameOver;
     public GameObject queenPrefab;
 
     private Camera mainCamera;
@@ -16,20 +24,28 @@ public class ChessGameManager : MonoBehaviour
     private readonly float squareSize = 41.8f;
 
     // Define the chessboard dimensions
-    private readonly int rows = 8;
-    private readonly int columns = 8;
-    private int queenCounter = 8;
+    public readonly int rows = 8;
+    public readonly int columns = 8;
+    public int queenCounter = 8;
+    public int unThreatenedSquares = 64;
 
-    public TextMeshPro timerText;
-    bool isRunning = true;
+    public TextMeshProUGUI timerText;
     float elapsedTime = 0f;
 
+    public GameObject scores;
+    public TextMeshProUGUI highscoreText;
+    public TextMeshProUGUI currentScoreText;
+    public TextMeshProUGUI highScoresText;
+    public GameObject replayButton;
+    
+    bool isRunning = true;
+    
     // Array to store logical representation of the chessboard
-    private GameObject[,] chessboardSquares;
+    public GameObject[,] chessboardSquares;
 
-    private bool[,] threatenedSquares = new bool[8, 8];
+    public bool[,] threatenedSquares = new bool[8, 8];
 
-    List<GameObject> spawnedQueens = new();
+    public List<GameObject> spawnedQueens = new();
 
     void Start()
     {
@@ -47,58 +63,88 @@ public class ChessGameManager : MonoBehaviour
         {
             elapsedTime += Time.deltaTime;
             timerText.text = "Time: " + Mathf.Round(elapsedTime);
+        } else
+        {
+            replayButton.gameObject.SetActive(true);
         }
 
-        // Check for touches
-        if (Input.touchCount > 0)
+        if (unThreatenedSquares == 0)
         {
-            Touch touch = Input.GetTouch(0);
-
-            if (touch.phase == TouchPhase.Began)
+            if (queenCounter == 0)
             {
-                // Raycast to detect the chessboard
-                Ray ray = mainCamera.ScreenPointToRay(touch.position);
-                RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);
-
-                if (hit.collider != null)
+                isWinner = true;
+                Debug.Log("You Won");
+                currentScoreText.gameObject.SetActive(true);
+                if (isHighScore)
                 {
-                    if (hit.collider.TryGetComponent<ChessSquare>(out var chessSquareComponent))
+                    highscoreText.gameObject.SetActive(true);
+                }
+            } else
+            {
+                gameOver = true;
+                GameOver.SetActive(true);
+            }
+            inGame.SetActive(false);
+            GameOver.SetActive(true);
+            scores.SetActive(true);
+            //inGame.transform.localPosition = new(0, 100f, 0);
+            StopTimer();
+        }
+        else if (unThreatenedSquares < 0)
+        {
+            Debug.Log("Error with unthreatened square count calculations occured.");
+        } else
+        {
+            // Check for touches
+            if (Input.touchCount > 0)
+            {
+                Touch touch = Input.GetTouch(0);
+
+                if (touch.phase == TouchPhase.Began)
+                {
+                    // Raycast to detect the chessboard
+                    Ray ray = mainCamera.ScreenPointToRay(touch.position);
+                    RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);
+
+                    if (hit.collider != null)
                     {
-                        if (queenCounter > 0 && !hit.collider.GetComponent<ChessSquare>().isOccupied && !hit.collider.GetComponent<ChessSquare>().isThreatened)
+                        if (hit.collider.TryGetComponent<ChessSquare>(out var chessSquareComponent))
                         {
-                            int row = chessSquareComponent.row;
-                            int col = chessSquareComponent.col;
+                            if (unThreatenedSquares > 0 && !hit.collider.GetComponent<ChessSquare>().isOccupied && !hit.collider.GetComponent<ChessSquare>().isThreatened)
+                            {
+                                int row = chessSquareComponent.row;
+                                int col = chessSquareComponent.col;
 
-                            GameObject queen = Instantiate(queenPrefab, chessSquareComponent.gameObject.transform);
-                            spawnedQueens.Add(queen);
-                            queenCounter--;
-                            queen.transform.SetParent(inGame.transform, false);
-                            queen.transform.SetParent(chessSquareComponent.gameObject.transform);
-                            queen.transform.localPosition = new(0, 0, -2);
+                                GameObject queen = Instantiate(queenPrefab, chessSquareComponent.gameObject.transform);
+                                spawnedQueens.Add(queen);
+                                queenCounter--;
+                                queen.transform.SetParent(inGame.transform, false);
+                                queen.transform.SetParent(chessSquareComponent.gameObject.transform);
+                                queen.transform.localPosition = new(0, 0, -2);
 
-                            hit.collider.GetComponent<ChessSquare>().isOccupied = true;
+                                hit.collider.GetComponent<ChessSquare>().isOccupied = true;
 
-                            MarkThreatenedSquares(row, col);
-                            HighlightThreatenedSquares(row, col);
-                        }
-                        else if (queenCounter == 0)
-                        {
-                            solutions.SetActive(true);
-                            StopTimer();
+                                MarkThreatenedSquares(row, col);
+                                HighlightThreatenedSquares(row, col);
+
+                                //Debug.Log("Unthreatened squares: " + unThreatenedSquares);
+                            }
+                            else
+                            {
+                                Debug.Log("Square is threatened!");
+                            }
                         }
                         else
                         {
-                            Debug.Log("Square is threatened!");
+                            Debug.Log(hit.collider.gameObject.name);
+                            Debug.Log("chessSquareComponent not found!");
                         }
-                    }
-                    else
-                    {
-                        Debug.Log(hit.collider.gameObject.name);
-                        Debug.Log("chessSquareComponent not found!");
                     }
                 }
             }
         }
+
+        
     }
 
     private void InitializeChessboardSquares()
@@ -121,7 +167,7 @@ public class ChessGameManager : MonoBehaviour
             for (int col = 0; col < columns; col++)
             {
                 float xPosition = (col - 4) * squareSize + 21.1f;
-                float yPosition = row * squareSize + 70.2f;
+                float yPosition = row * squareSize - 95.9f;
 
                 // Create a logical representation of the chessboard square
                 chessboardSquares[row, col] = new GameObject("ChessboardSquare_" + row + "_" + col);
@@ -152,14 +198,26 @@ public class ChessGameManager : MonoBehaviour
 
     private void MarkThreatenedSquares(int row, int col)
     {
-
         for (int i = 0; i < 8; i++)
         {
-            chessboardSquares[row, i].GetComponent<ChessSquare>().isThreatened = true;
-            chessboardSquares[i, col].GetComponent<ChessSquare>().isThreatened = true;
+            if (chessboardSquares[row, i].GetComponent<ChessSquare>().isThreatened == false && chessboardSquares[i, col].GetComponent<ChessSquare>().isThreatened == false)
+            {
+                chessboardSquares[row, i].GetComponent<ChessSquare>().isThreatened = true;
+                chessboardSquares[i, col].GetComponent<ChessSquare>().isThreatened = true;
+                if (col == row && row == i)
+                {
+                    unThreatenedSquares--;
+                }
+                else
+                {
+                    unThreatenedSquares--;
+                    unThreatenedSquares--;
+                }
+            }
 
             threatenedSquares[row, i] = true;
             threatenedSquares[i, col] = true;
+
         }
 
         for (int i = 0; i < 8; i++)
@@ -168,8 +226,12 @@ public class ChessGameManager : MonoBehaviour
             {
                 if (i == row || j == col || Math.Abs(i - row) == Math.Abs(j - col))
                 {
-                    chessboardSquares[i, j].GetComponent<ChessSquare>().isThreatened = true;
-                    threatenedSquares[i, j] = true;
+                    if (chessboardSquares[i, j].GetComponent<ChessSquare>().isThreatened == false)
+                    {
+                        chessboardSquares[i, j].GetComponent<ChessSquare>().isThreatened = true;
+                        threatenedSquares[i, j] = true;
+                        unThreatenedSquares--;
+                    }
                 }
             }
         }
@@ -196,28 +258,38 @@ public class ChessGameManager : MonoBehaviour
         }
     }
 
-    void StartTimer()
+    public void StartTimer()
     {
         // Kronometreyi baþlat
         isRunning = true;
     }
 
-    void StopTimer()
+    private void StopTimer()
     {
         // Kronometreyi durdur
         isRunning = false;
     }
 
-    void ResetGame()
+    public void ResetGame()
     {
         // Oyunu sýfýrla
         queenCounter = 8;
+        unThreatenedSquares = 64;
+
+        inGame.SetActive(true);
+        currentScoreText.gameObject.SetActive(false);
+        highscoreText.gameObject.SetActive(false);
+        scores.SetActive(false);
+        GameOver.SetActive(false);
+        replayButton.gameObject.SetActive(false);
 
         for (int i = 0; i < rows; i++)
         {
             for (int j = 0; j < columns; j++)
             {
-                threatenedSquares[i,j] = false;
+                threatenedSquares[i, j] = false;
+                chessboardSquares[i, j].GetComponent<ChessSquare>().isThreatened = false;
+                chessboardSquares[i, j].GetComponent<ChessSquare>().isOccupied = false;
                 chessboardSquares[i, j].transform.position = new(chessboardSquares[i, j].transform.position.x,
                         chessboardSquares[i, j].transform.position.y, 90f);
             }
@@ -228,6 +300,8 @@ public class ChessGameManager : MonoBehaviour
             Destroy(queen);
         }
 
+        gameOver = false;
+        isWinner = false;
         StartTimer();
     }
 }
