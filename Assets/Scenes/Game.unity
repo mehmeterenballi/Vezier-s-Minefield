@@ -644,7 +644,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 864130376}
-  m_Father: {fileID: 257217574}
+  m_Father: {fileID: 1187528733}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -786,9 +786,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 511459383}
   - {fileID: 106332656}
-  - {fileID: 203621677}
   m_Father: {fileID: 1187528733}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -853,7 +851,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &511459383
 RectTransform:
   m_ObjectHideFlags: 0
@@ -870,7 +868,7 @@ RectTransform:
   - {fileID: 1490187744}
   - {fileID: 782003209}
   - {fileID: 162155551}
-  m_Father: {fileID: 257217574}
+  m_Father: {fileID: 1187528733}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -1786,6 +1784,8 @@ RectTransform:
   m_Children:
   - {fileID: 1950391718}
   - {fileID: 257217574}
+  - {fileID: 511459383}
+  - {fileID: 203621677}
   m_Father: {fileID: 1394301271}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -2366,6 +2366,7 @@ MonoBehaviour:
   isWinner: 0
   gameOver: 0
   GameOver: {fileID: 257217573}
+  solutions: {fileID: 511459382}
   queenPrefab: {fileID: 6481516807162851338, guid: cfc8aeecdcd5ccd4e9411e7aa6de5896, type: 3}
   inGame: {fileID: 173890004}
   queenCounter: 8

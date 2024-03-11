@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Xml.Linq;
 using TMPro;
 using UnityEngine;
-using static UnityEngine.Rendering.DebugUI.Table;
+
 
 public class ChessGameManager : MonoBehaviour
 {
@@ -15,8 +13,8 @@ public class ChessGameManager : MonoBehaviour
 
     private bool isHighScore = false;
 
-    //public GameObject chessBoard;
     public GameObject GameOver;
+    public GameObject solutions;
     public GameObject queenPrefab;
 
     private Camera mainCamera;
@@ -34,13 +32,18 @@ public class ChessGameManager : MonoBehaviour
     public TextMeshProUGUI timerText;
     float elapsedTime = 0f;
 
+    private int score = 0;
+
     public GameObject scores;
+    string[] highscoreStrings;
     public TextMeshProUGUI highscoreText;
     public TextMeshProUGUI currentScoreText;
     public TextMeshProUGUI highScoresText;
+    private int[] highscores = new int[5];
     public GameObject replayButton;
 
     bool isRunning = true;
+    bool areScoresDisplayed = false;
 
     // Array to store logical representation of the chessboard
     public GameObject[,] chessboardSquares;
@@ -57,42 +60,19 @@ public class ChessGameManager : MonoBehaviour
 
         // Initialize the chessboardSquares array
         InitializeChessboardSquares();
+        CheckScore(score);
     }
 
     void Update()
     {
-        if (isRunning)
-        {
-            elapsedTime += Time.deltaTime;
-            timerText.text = "Time: " + Mathf.Round(elapsedTime);
-        }
-        else
-        {
-            replayButton.gameObject.SetActive(true);
-        }
-
         if (unThreatenedSquares == 0)
         {
-            if (queenCounter == 0)
+            if (!areScoresDisplayed) // Her çevrimde iþlenmesin diye
             {
-                isWinner = true;
-                Debug.Log("You Won");
-                currentScoreText.gameObject.SetActive(true);
-                if (isHighScore)
-                {
-                    highscoreText.gameObject.SetActive(true);
-                }
+                CheckScore(score);
+                ShowScore();
             }
-            else
-            {
-                gameOver = true;
-                GameOver.SetActive(true);
-            }
-            inGame.SetActive(false);
-            GameOver.SetActive(true);
-            scores.SetActive(true);
-            //inGame.transform.localPosition = new(0, 100f, 0);
-            StopTimer();
+            replayButton.SetActive(true);
         }
         else if (unThreatenedSquares < 0)
         {
@@ -100,6 +80,13 @@ public class ChessGameManager : MonoBehaviour
         }
         else
         {
+            elapsedTime += Time.deltaTime;
+            timerText.text = "Time: " + Mathf.Round(elapsedTime);
+            score = (int)Mathf.Round(elapsedTime);
+            if (areScoresDisplayed) // Her çevrimde iþlenmesin diye
+            {
+                HideScores();
+            }
             // Check for touches
             if (Input.touchCount > 0)
             {
@@ -148,8 +135,6 @@ public class ChessGameManager : MonoBehaviour
                 }
             }
         }
-
-
     }
 
     private void InitializeChessboardSquares()
@@ -275,11 +260,114 @@ public class ChessGameManager : MonoBehaviour
         isRunning = false;
     }
 
+    private void InsertAndShift(int[] array, int index, int value)
+    {
+        for (int i = array.Length - 1; i > index; i--)
+        {
+            array[i] = array[i - 1];
+        }
+        array[index] = value;
+    }
+
+    private void CheckScore(int score)
+    {
+        highscoreStrings = PlayerPrefs.GetString("highscores", "").Split(",");
+        isHighScore = false;
+
+        if (queenCounter == 0)
+        {
+            if (highscoreStrings[0] == "")
+            {
+                highscores = new int[5];
+                highscores[0] = score;
+                isHighScore = true;
+                KeepRecord();
+            }
+            else if (highscoreStrings.Length < 5)
+            {
+                if (unThreatenedSquares == 0)
+                {
+                    highscores[highscoreStrings.Length - 1] = score;
+                    isHighScore = true;
+                    KeepRecord();
+                }
+            }
+            else
+            {
+                for (int i = 0; i < highscoreStrings.Length; i++)
+                {
+                    if (Int32.TryParse(highscoreStrings[i], out int currentScore))
+                    {
+                        highscores[i] = currentScore;
+                        if (score < highscores[i])
+                        {
+                            isHighScore = true;
+                            InsertAndShift(highscores, i, score);
+                            KeepRecord();
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        Debug.Log("Invalid score: " + highscoreStrings[i]);
+                    }
+                }
+            }
+        }
+    }
+
+    private void KeepRecord()
+    {
+        Array.Sort(highscores);
+        string highscoresString = string.Join(",", highscores.Select(p => p.ToString()).ToArray());
+        PlayerPrefs.SetString("highscores", highscoresString);
+    }
+
+
+
+    private void ShowScore()
+    {
+        if (queenCounter == 0)
+        {
+            isWinner = true;
+            Debug.Log("You Won");
+            currentScoreText.text = score + "!";
+            currentScoreText.gameObject.SetActive(true);
+            if (isHighScore)
+            {
+                highscoreText.gameObject.SetActive(true);
+            }
+        }
+        else
+        {
+            gameOver = true;
+            GameOver.SetActive(true);
+        }
+
+        highScoresText.text = "Best Score: " + highscores[0] + "\n";
+        for (int i = 1; i < highscores.Length; i++)
+        {
+            highScoresText.text += (i + 1).ToString() + ": " + highscores[i] + "\n";
+        }
+
+        inGame.SetActive(false);
+        scores.SetActive(true);
+        solutions.SetActive(true);
+        StopTimer();
+        areScoresDisplayed = true;
+    }
+
+    private void HideScores()
+    {
+        StartTimer();
+        areScoresDisplayed = false;
+    }
 
     public void ResetGame()
     {
         // Oyunu sýfýrla
         elapsedTime = 0f;
+        score = 0;
         queenCounter = 8;
         unThreatenedSquares = 64;
 
@@ -287,6 +375,7 @@ public class ChessGameManager : MonoBehaviour
         currentScoreText.gameObject.SetActive(false);
         highscoreText.gameObject.SetActive(false);
         scores.SetActive(false);
+        solutions.SetActive(false);
         GameOver.SetActive(false);
         replayButton.SetActive(false);
 
@@ -309,7 +398,6 @@ public class ChessGameManager : MonoBehaviour
 
         gameOver = false;
         isWinner = false;
-        StartTimer();
-
+        HideScores();
     }
 }
