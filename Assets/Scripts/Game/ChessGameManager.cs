@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Xml.Linq;
 using TMPro;
 using UnityEngine;
@@ -37,9 +39,9 @@ public class ChessGameManager : MonoBehaviour
     public TextMeshProUGUI currentScoreText;
     public TextMeshProUGUI highScoresText;
     public GameObject replayButton;
-    
+
     bool isRunning = true;
-    
+
     // Array to store logical representation of the chessboard
     public GameObject[,] chessboardSquares;
 
@@ -63,7 +65,8 @@ public class ChessGameManager : MonoBehaviour
         {
             elapsedTime += Time.deltaTime;
             timerText.text = "Time: " + Mathf.Round(elapsedTime);
-        } else
+        }
+        else
         {
             replayButton.gameObject.SetActive(true);
         }
@@ -79,7 +82,8 @@ public class ChessGameManager : MonoBehaviour
                 {
                     highscoreText.gameObject.SetActive(true);
                 }
-            } else
+            }
+            else
             {
                 gameOver = true;
                 GameOver.SetActive(true);
@@ -93,7 +97,8 @@ public class ChessGameManager : MonoBehaviour
         else if (unThreatenedSquares < 0)
         {
             Debug.Log("Error with unthreatened square count calculations occured.");
-        } else
+        }
+        else
         {
             // Check for touches
             if (Input.touchCount > 0)
@@ -144,7 +149,7 @@ public class ChessGameManager : MonoBehaviour
             }
         }
 
-        
+
     }
 
     private void InitializeChessboardSquares()
@@ -270,9 +275,11 @@ public class ChessGameManager : MonoBehaviour
         isRunning = false;
     }
 
+
     public void ResetGame()
     {
         // Oyunu sýfýrla
+        elapsedTime = 0f;
         queenCounter = 8;
         unThreatenedSquares = 64;
 
@@ -281,7 +288,7 @@ public class ChessGameManager : MonoBehaviour
         highscoreText.gameObject.SetActive(false);
         scores.SetActive(false);
         GameOver.SetActive(false);
-        replayButton.gameObject.SetActive(false);
+        replayButton.SetActive(false);
 
         for (int i = 0; i < rows; i++)
         {
@@ -303,5 +310,6 @@ public class ChessGameManager : MonoBehaviour
         gameOver = false;
         isWinner = false;
         StartTimer();
+
     }
 }

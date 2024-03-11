@@ -40,3 +40,4 @@ public class ResetPlayScene : MonoBehaviour
         gameManager.StartTimer();
     }
 }
+ 
