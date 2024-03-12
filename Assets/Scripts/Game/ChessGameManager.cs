@@ -40,11 +40,14 @@ public class ChessGameManager : MonoBehaviour
     public TextMeshProUGUI highscoreText;
     public TextMeshProUGUI currentScoreText;
     public TextMeshProUGUI highScoresText;
-    private int[] highscores = new int[5];
+    //private int[] highscores = new int[5];
+    List<int> highscores = new(5);
     public GameObject replayButton;
 
     bool isRunning = true;
     bool areScoresDisplayed = false;
+
+    private bool breakForLoop = false;
 
     // Array to store logical representation of the chessboard
     public GameObject[,] chessboardSquares;
@@ -273,14 +276,14 @@ public class ChessGameManager : MonoBehaviour
     private void CheckScore(int score)
     {
         highscoreStrings = PlayerPrefs.GetString("highscores", "").Split(",");
-        //Debug.Log(highscoreStrings + " " + highscoreStrings.Length + highscoreStrings[0]);
         isHighScore = false;
 
         if (queenCounter == 0)
         {
             if (highscoreStrings[0] == "")
             {
-                highscores[0] = score;
+                highscores.Add(score);
+                //Debug.Log("highsscores array length: " + highscores.Length);
                 isHighScore = true;
                 KeepRecord();
             }
@@ -293,12 +296,20 @@ public class ChessGameManager : MonoBehaviour
                         highscores[i] = currentScore;
                         if (score == highscores[i])
                         {
+                            isHighScore = true;
                             break;
                         }
                         if (score < highscores[i])
                         {
                             isHighScore = true;
-                            InsertAndShift(highscores, i, score);
+                            highscores.Insert(i, score);
+                            KeepRecord();
+                            break;
+                        }
+                        else if (score > highscores.Max() && highscores.Count < 5)
+                        {
+                            isHighScore = true;
+                            highscores.Insert(highscores.Count, score);
                             KeepRecord();
                             break;
                         }
@@ -308,7 +319,6 @@ public class ChessGameManager : MonoBehaviour
                         Debug.Log("Invalid score: " + highscoreStrings[i]);
                     }
                 }
-
             }
             else
             {
@@ -316,12 +326,13 @@ public class ChessGameManager : MonoBehaviour
                 {
                     if (Int32.TryParse(highscoreStrings[i], out int currentScore))
                     {
-                        highscores[i] = currentScore;
-                        if (score < highscores[i])
+                        highscores.Insert(i, currentScore);
+                        Debug.Log("highscores size: " + highscores.Count + ", i: " + i);
+                        if (score < highscores[i] && i != 5 && score != highscores[i + 1] && score != highscores[i])
                         {
+                            highscores.Insert(i, currentScore);
+                            highscores.RemoveAt(highscores.Count - 1);
                             isHighScore = true;
-                            InsertAndShift(highscores, i, score);
-                            KeepRecord();
                             break;
                         }
                     }
@@ -336,18 +347,7 @@ public class ChessGameManager : MonoBehaviour
 
     private void KeepRecord()
     {
-        Array.Sort(highscores);
-        List<int> yeniDizi = new List<int>();
-        for (int i = 0; i < highscores.Length; i++)
-        {
-            if (highscores[i] != 0)
-            {
-                yeniDizi.Add(highscores[i]);
-            }
-        }
-        int[] sonuc = yeniDizi.ToArray();
-        klon = (int[])sonuc.Clone();
-        string highscoresString = string.Join(",", sonuc.Select(p => p.ToString()).ToArray());
+        string highscoresString = string.Join(",", highscores.Select(p => p.ToString()).ToArray());
         PlayerPrefs.SetString("highscores", highscoresString);
     }
 
@@ -370,22 +370,17 @@ public class ChessGameManager : MonoBehaviour
             GameOver.SetActive(true);
         }
 
-        highScoresText.text = "Best Score: " + klon[0] + "\n";
-        if (klon.Length > 0)
+        if (highscores.Count > 0)
         {
-            for (int i = 1; i < klon.Length; i++)
+            highScoresText.text = "Best Score: " + highscores[0] + "\n";
+            if (highscores.Count != 1)
             {
-                highScoresText.text += (i + 1).ToString() + ": " + klon[i] + "\n";
+                for (int i = 1; i < highscores.Count; i++)
+                {
+                    highScoresText.text += (i + 1).ToString() + ": " + highscores[i] + "\n";
+                }
             }
         }
-        else
-        {
-            for (int i = 0; i < klon.Length; i++)
-            {
-                highScoresText.text += (i + 1).ToString() + ": " + klon[i] + "\n";
-            }
-        }
-
 
         inGame.SetActive(false);
         scores.SetActive(true);
@@ -435,6 +430,7 @@ public class ChessGameManager : MonoBehaviour
 
         gameOver = false;
         isWinner = false;
+        breakForLoop = false;
         HideScores();
     }
 }
