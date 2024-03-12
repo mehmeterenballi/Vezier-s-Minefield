@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,7 +11,10 @@ public class VolumeSettings : MonoBehaviour
     [SerializeField]
     private Slider slider;
 
-    private void Start() { LoadAudio(); }
+    private void Start()
+    {
+        LoadAudio();
+    }
 
     public void SetAudio(float value)
     {
@@ -29,8 +30,7 @@ public class VolumeSettings : MonoBehaviour
 
     private void LoadAudio()
     {
-        PlayerPrefs.SetFloat("audioVolume", 0.5f);
         AudioListener.volume = PlayerPrefs.GetFloat("audioVolume", 0.5f);
-        slider.value = PlayerPrefs.GetFloat("audioVolume");
+        slider.value = PlayerPrefs.GetFloat("audioVolume", 0.5f);
     }
 }

@@ -43,6 +43,8 @@ public class ChessGameManager : MonoBehaviour
     //private int[] highscores = new int[5];
     List<int> highscores = new(5);
     public GameObject replayButton;
+    public GameObject backButton;
+    public GameObject backArrowButton;
 
     bool isRunning = true;
     bool areScoresDisplayed = false;
@@ -77,6 +79,8 @@ public class ChessGameManager : MonoBehaviour
                 ShowScore();
             }
             replayButton.SetActive(true);
+            backButton.SetActive(true);
+            backArrowButton.SetActive(false);
         }
         else if (unThreatenedSquares < 0)
         {
@@ -293,7 +297,7 @@ public class ChessGameManager : MonoBehaviour
                 {
                     if (Int32.TryParse(highscoreStrings[i], out int currentScore))
                     {
-                        highscores[i] = currentScore;
+                        highscores.Insert(i, currentScore);
                         if (score == highscores[i])
                         {
                             isHighScore = true;
@@ -332,6 +336,7 @@ public class ChessGameManager : MonoBehaviour
                         {
                             highscores.Insert(i, currentScore);
                             highscores.RemoveAt(highscores.Count - 1);
+                            highscores = highscores.Distinct().ToList();
                             isHighScore = true;
                             break;
                         }
@@ -347,6 +352,7 @@ public class ChessGameManager : MonoBehaviour
 
     private void KeepRecord()
     {
+        highscores = highscores.Distinct().ToList();
         string highscoresString = string.Join(",", highscores.Select(p => p.ToString()).ToArray());
         PlayerPrefs.SetString("highscores", highscoresString);
     }
@@ -369,10 +375,22 @@ public class ChessGameManager : MonoBehaviour
             gameOver = true;
             GameOver.SetActive(true);
         }
-
+        highscores = highscores.Distinct().ToList();
         if (highscores.Count > 0)
         {
-            highScoresText.text = "Best Score: " + highscores[0] + "\n";
+            string bestScoreText = "Best Score: ";
+            if (PlayerPrefs.GetString("ChosenLanguage", "TR") == "EN")
+            {
+                bestScoreText = "Best Score: ";
+            }
+            else if(PlayerPrefs.GetString("ChosenLanguage", "TR") == "TR")
+            {
+                bestScoreText = "En Ýyi Skor: ";
+            }else
+            {
+                Debug.Log("ChosenLanguage PlayerPref deðerine ulaþýlamýyor.");
+            }
+            highScoresText.text = bestScoreText + highscores[0] + "\n";
             if (highscores.Count != 1)
             {
                 for (int i = 1; i < highscores.Count; i++)
@@ -409,7 +427,8 @@ public class ChessGameManager : MonoBehaviour
         scores.SetActive(false);
         solutions.SetActive(false);
         GameOver.SetActive(false);
-        replayButton.SetActive(false);
+        backButton.SetActive(false);
+        backArrowButton.SetActive(true);
 
         for (int i = 0; i < rows; i++)
         {
