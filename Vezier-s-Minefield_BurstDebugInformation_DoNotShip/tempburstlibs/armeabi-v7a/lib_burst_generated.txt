@@ -23,6 +23,7 @@ Library: C:\Personal\Engineering\unity\Vezier-s-Minefield\Temp\BurstOutput\tempb
 --assembly-defines=Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary;
 --assembly-defines=Unity.RenderPipelines.Universal.Runtime;
 --assembly-defines=Unity.Burst;
+--assembly-defines=Nobi.UiRoundedCorners;
 --assembly-defines=Unity.VisualScripting.Core;
 --assembly-defines=Unity.2D.Animation.Runtime;
 --assembly-defines=Unity.2D.Tilemap.Extras;
@@ -92,6 +93,7 @@ Library: C:\Personal\Engineering\unity\Vezier-s-Minefield\Temp\BurstOutput\tempb
 --assembly-defines=Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary;
 --assembly-defines=Unity.RenderPipelines.Universal.Runtime;
 --assembly-defines=Unity.Burst;
+--assembly-defines=Nobi.UiRoundedCorners;
 --assembly-defines=Unity.VisualScripting.Core;
 --assembly-defines=Unity.2D.Animation.Runtime;
 --assembly-defines=Unity.2D.Tilemap.Extras;
