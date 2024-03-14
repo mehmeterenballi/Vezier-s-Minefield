@@ -21,4 +21,16 @@ public class Utilites : MonoBehaviour
     {
         audioSource.volume = PlayerPrefs.GetFloat("audioVolume", 0.5f);
     }
+
+    public static void StartTimer()
+    {
+        // Kronometreyi baþlat
+        ChessGameManager.isRunning = true;
+    }
+
+    public static void StopTimer()
+    {
+        // Kronometreyi durdur
+        ChessGameManager.isRunning = false;
+    }
 }
