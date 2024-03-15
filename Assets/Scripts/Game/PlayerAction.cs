@@ -5,6 +5,20 @@ using UnityEngine;
 
 public class PlayerAction : MonoBehaviour
 {
+    public static PlayerAction instance;
+    private void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+        //DontDestroyOnLoad(gameObject);
+    }
+
     public void TouchBoard(Camera mainCamera)
     {
         // Check for touches

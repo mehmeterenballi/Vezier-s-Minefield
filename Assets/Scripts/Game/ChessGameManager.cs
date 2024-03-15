@@ -8,7 +8,6 @@ using UnityEngine;
 public class ChessGameManager : MonoBehaviour
 {
     CheckScore checkScore;
-    PlayerAction playerAction;
 
     public static bool isWinner = false;
     public static bool gameOver = false;
@@ -77,7 +76,7 @@ public class ChessGameManager : MonoBehaviour
             }
 
             // Kullanýcý tahtaya týkladýðýnda çalýþýr
-            playerAction.TouchBoard(mainCamera);
+            PlayerAction.instance.TouchBoard(mainCamera);
         }
     }
 

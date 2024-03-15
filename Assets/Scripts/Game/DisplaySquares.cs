@@ -24,7 +24,6 @@ public class DisplaySquares : MonoBehaviour
         {
             Destroy(gameObject);
         }
-
         //DontDestroyOnLoad(gameObject);
     }
 

@@ -2,12 +2,25 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Xml.Linq;
 using UnityEngine;
-using static UnityEngine.Rendering.DebugUI.Table;
-using UnityEngine.UIElements;
 using System;
 
 public class ChessSquareManager : MonoBehaviour
 {
+    public static ChessSquareManager instance;
+    private void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+
+        //DontDestroyOnLoad(gameObject);
+    }
+
     // Array to store logical representation of the chessboard
     public GameObject[,] chessboardSquares;
 
