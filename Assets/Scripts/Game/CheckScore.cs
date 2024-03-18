@@ -7,7 +7,6 @@ using UnityEngine;
 
 public class CheckScore : MonoBehaviour
 {
-    ChessGameManager gameManager;
     private string[] highscoreStrings;
     public static bool isHighScore = false;
     public static List<int> highscores = new(5);
@@ -22,12 +21,26 @@ public class CheckScore : MonoBehaviour
     //    array[index] = value;
     //}
 
+    //public static CheckScore instance;
+    //private void Awake()
+    //{
+    //    if (instance == null)
+    //    {
+    //        instance = this;
+    //    }
+    //    else
+    //    {
+    //        Destroy(gameObject);
+    //    }
+    //    //DontDestroyOnLoad(gameObject);
+    //}
+
     public void ManageScore(int score)
     {
         highscoreStrings = PlayerPrefs.GetString("highscores", "").Split(",");
         isHighScore = false;
 
-        if (ChessGameManager.queenCounter == 0)
+        if (ChessGameManager.MasterSingleton.queenCounter == 0)
         {
             if (highscoreStrings[0] == "")
             {

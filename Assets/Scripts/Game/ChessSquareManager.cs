@@ -29,7 +29,7 @@ public class ChessSquareManager : MonoBehaviour
     public void InitializeChessboardSquares()
     {
         // Initialize the chessboardSquares array
-        chessboardSquares = new GameObject[ChessGameManager.rows, ChessGameManager.columns];
+        chessboardSquares = new GameObject[ChessGameManager.MasterSingleton.rows, ChessGameManager.MasterSingleton.columns];
 
         // Load the sprite that you want to use for the chessboard squares
         Sprite squareSprite = Resources.Load<Sprite>("Sprites/Square");
@@ -41,9 +41,9 @@ public class ChessSquareManager : MonoBehaviour
         }
 
         // Populate the array with logical representations of the chessboard squares
-        for (int row = 0; row < ChessGameManager.rows; row++)
+        for (int row = 0; row < ChessGameManager.MasterSingleton.rows; row++)
         {
-            for (int col = 0; col < ChessGameManager.columns; col++)
+            for (int col = 0; col < ChessGameManager.MasterSingleton.columns; col++)
             {
                 float xPosition = (col - 4) * squareSize + 21.1f;
                 float yPosition = row * squareSize - 95.9f;
@@ -62,7 +62,7 @@ public class ChessSquareManager : MonoBehaviour
                 chessboardSquares[row, col].GetComponent<SpriteRenderer>().color = new Color32(200, 0, 0, 180);
 
                 // Set the inGame as the parent of the chessboard square
-                chessboardSquares[row, col].transform.SetParent(ChessGameManager.inGame.transform, false);
+                chessboardSquares[row, col].transform.SetParent(ChessGameManager.MasterSingleton.inGame.transform, false);
 
                 // Set the scale of each chessboard square (adjust the multiplier as needed)
                 float scaleMultiplier = 42f;
@@ -85,17 +85,17 @@ public class ChessSquareManager : MonoBehaviour
                 chessboardSquares[i, col].GetComponent<ChessSquare>().isThreatened = true;
                 if (col == row && row == i)
                 {
-                    ChessGameManager.unThreatenedSquares--;
+                    ChessGameManager.MasterSingleton.unThreatenedSquares--;
                 }
                 else
                 {
-                    ChessGameManager.unThreatenedSquares--;
-                    ChessGameManager.unThreatenedSquares--;
+                    ChessGameManager.MasterSingleton.unThreatenedSquares--;
+                    ChessGameManager.MasterSingleton.unThreatenedSquares--;
                 }
             }
 
-            ChessGameManager.threatenedSquares[row, i] = true;
-            ChessGameManager.threatenedSquares[i, col] = true;
+            ChessGameManager.MasterSingleton.threatenedSquares[row, i] = true;
+            ChessGameManager.MasterSingleton.threatenedSquares[i, col] = true;
 
         }
 
@@ -108,8 +108,8 @@ public class ChessSquareManager : MonoBehaviour
                     if (chessboardSquares[i, j].GetComponent<ChessSquare>().isThreatened == false)
                     {
                         chessboardSquares[i, j].GetComponent<ChessSquare>().isThreatened = true;
-                        ChessGameManager.threatenedSquares[i, j] = true;
-                        ChessGameManager.unThreatenedSquares--;
+                        ChessGameManager.MasterSingleton.threatenedSquares[i, j] = true;
+                        ChessGameManager.MasterSingleton.unThreatenedSquares--;
                     }
                 }
             }
@@ -119,11 +119,11 @@ public class ChessSquareManager : MonoBehaviour
     public void HighlightThreatenedSquares(int row, int col)
     {
         // Tüm kareleri kontrol et ve tehdit altýndakileri kýrmýzý yap
-        for (int i = 0; i < ChessGameManager.rows; i++)
+        for (int i = 0; i < ChessGameManager.MasterSingleton.rows; i++)
         {
-            for (int j = 0; j < ChessGameManager.columns; j++)
+            for (int j = 0; j < ChessGameManager.MasterSingleton.columns; j++)
             {
-                if (ChessGameManager.threatenedSquares[i, j] == true && chessboardSquares[i, j].GetComponent<ChessSquare>().isOccupied == false)
+                if (ChessGameManager.MasterSingleton.threatenedSquares[i, j] == true && chessboardSquares[i, j].GetComponent<ChessSquare>().isOccupied == false)
                 {
                     chessboardSquares[i, j].transform.position = new(chessboardSquares[i, j].transform.position.x,
                         chessboardSquares[i, j].transform.position.y, -2f);

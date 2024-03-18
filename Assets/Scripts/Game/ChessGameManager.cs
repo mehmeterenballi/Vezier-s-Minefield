@@ -2,46 +2,70 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 
 
 public class ChessGameManager : MonoBehaviour
 {
-    CheckScore checkScore;
 
-    public static bool isWinner = false;
-    public static bool gameOver = false;
+    //public CheckScore CheckScore { get; private set; }
+    //CheckScore = GetComponentInChildren<AudioManager>();
+
+    public static ChessGameManager MasterSingleton { get; private set; }
+
+    public CheckScore CheckScore { get; private set; }
+    public DisplaySquares DisplaySquares { get; private set; }
+    public PlayerAction PlayerAction { get; private set; }
+
+    private void Awake()
+    {
+        if (MasterSingleton != null && MasterSingleton != this)
+        {
+            Destroy(this);
+            return;
+        }
+
+        MasterSingleton = this;
+
+        CheckScore = GetComponentInChildren<CheckScore>();
+        DisplaySquares = GetComponentInChildren<DisplaySquares>();
+        PlayerAction = GetComponentInChildren<PlayerAction>();
+    }
+
+    public bool isWinner = false;
+    public bool gameOver = false;
 
     private int[] klon;
 
-    public static GameObject GameOver;
-    public static GameObject solutions;
-    public static GameObject queenPrefab;
+    public GameObject GameOver;
+    public GameObject solutions;
+    public GameObject queenPrefab;
 
     private Camera mainCamera;
-    public static GameObject inGame;
+    public GameObject inGame;
 
     // Define the chessboard dimensions
-    public static int rows = 8;
-    public static int columns = 8;
-    public static int queenCounter = 8;
-    public static int unThreatenedSquares = 64;
+    public int rows = 8;
+    public int columns = 8;
+    public int queenCounter = 8;
+    public int unThreatenedSquares = 64;
 
     public TextMeshProUGUI timerText;
-    public static float elapsedTime = 0f;
+    public float elapsedTime = 0f;
 
-    public static int score = 0;
+    public int score = 0;
 
     public TextMeshProUGUI currentScoreText;
     public GameObject replayButton;
     public GameObject backButton;
     public GameObject backArrowButton;
 
-    public static bool isRunning = true;
+    public bool isRunning = true;
 
-    public static bool[,] threatenedSquares = new bool[8, 8];
+    public bool[,] threatenedSquares = new bool[8, 8];
 
-    public static List<GameObject> spawnedQueens = new();
+    public List<GameObject> spawnedQueens = new();
 
     void Start()
     {
@@ -50,8 +74,7 @@ public class ChessGameManager : MonoBehaviour
         Utilites.StartTimer();
 
         // Initialize the chessboardSquares array
-        DisplaySquares.instance.InitializeChessboardSquares();
-        checkScore.ManageScore(score);
+        DisplaySquares.InitializeChessboardSquares();
     }
 
     void Update()
@@ -76,7 +99,7 @@ public class ChessGameManager : MonoBehaviour
             }
 
             // Kullanýcý tahtaya týkladýðýnda çalýþýr
-            PlayerAction.instance.TouchBoard(mainCamera);
+            PlayerAction.TouchBoard(mainCamera);
         }
     }
 
@@ -84,7 +107,7 @@ public class ChessGameManager : MonoBehaviour
     {
         if (!DisplayScore.areScoresDisplayed) // Her çevrimde iþlenmesin diye
         {
-            checkScore.ManageScore(score);
+            CheckScore.ManageScore(score);
             DisplayScore.ShowScore();
         }
         replayButton.SetActive(true);

@@ -7,24 +7,24 @@ public class ResetPlayScene : MonoBehaviour
     public void ResetGame()
     {
         // Oyunu sýfýrla
-        ChessGameManager.elapsedTime = 0f;
-        ChessGameManager.score = 0;
-        ChessGameManager.queenCounter = 8;
-        ChessGameManager.unThreatenedSquares = 64;
+        ChessGameManager.MasterSingleton.elapsedTime = 0f;
+        ChessGameManager.MasterSingleton.score = 0;
+        ChessGameManager.MasterSingleton.queenCounter = 8;
+        ChessGameManager.MasterSingleton.unThreatenedSquares = 64;
 
-        ChessGameManager.inGame.SetActive(true);
+        ChessGameManager.MasterSingleton.inGame.SetActive(true);
         gameManager.currentScoreText.gameObject.SetActive(false);
         DisplayScore.highscoreText.gameObject.SetActive(false);
         DisplayScore.scores.SetActive(false);
-        ChessGameManager.solutions.SetActive(false);
-        ChessGameManager.GameOver.SetActive(false);
+        ChessGameManager.MasterSingleton.solutions.SetActive(false);
+        ChessGameManager.MasterSingleton.GameOver.SetActive(false);
         gameManager.replayButton.SetActive(false);
 
-        for (int i = 0; i < ChessGameManager.rows; i++)
+        for (int i = 0; i < ChessGameManager.MasterSingleton.rows; i++)
         {
-            for (int j = 0; j < ChessGameManager.columns; j++)
+            for (int j = 0; j < ChessGameManager.MasterSingleton.columns; j++)
             {
-                ChessGameManager.threatenedSquares[i, j] = false;
+                ChessGameManager.MasterSingleton.threatenedSquares[i, j] = false;
                 DisplaySquares.chessboardSquares[i, j].GetComponent<ChessSquare>().isThreatened = false;
                 DisplaySquares.chessboardSquares[i, j].GetComponent<ChessSquare>().isOccupied = false;
                 DisplaySquares.chessboardSquares[i, j].transform.position = new(DisplaySquares.chessboardSquares[i, j].transform.position.x,
@@ -32,13 +32,13 @@ public class ResetPlayScene : MonoBehaviour
             }
         }
 
-        foreach (GameObject queen in ChessGameManager.spawnedQueens)
+        foreach (GameObject queen in ChessGameManager.MasterSingleton.spawnedQueens)
         {
             Destroy(queen);
         }
 
-        ChessGameManager.gameOver = false;
-        ChessGameManager.isWinner = false;
+        ChessGameManager.MasterSingleton.gameOver = false;
+        ChessGameManager.MasterSingleton.isWinner = false;
         DisplayScore.HideScores();
     }
 }

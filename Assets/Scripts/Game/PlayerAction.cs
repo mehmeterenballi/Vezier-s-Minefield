@@ -5,20 +5,6 @@ using UnityEngine;
 
 public class PlayerAction : MonoBehaviour
 {
-    public static PlayerAction instance;
-    private void Awake()
-    {
-        if (instance == null)
-        {
-            instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-        //DontDestroyOnLoad(gameObject);
-    }
-
     public void TouchBoard(Camera mainCamera)
     {
         // Check for touches
@@ -36,7 +22,7 @@ public class PlayerAction : MonoBehaviour
                 {
                     if (hit.collider.TryGetComponent<ChessSquare>(out var chessSquareComponent))
                     {
-                        if (ChessGameManager.unThreatenedSquares > 0 && !hit.collider.GetComponent<ChessSquare>().isOccupied && !hit.collider.GetComponent<ChessSquare>().isThreatened)
+                        if (ChessGameManager.MasterSingleton.unThreatenedSquares > 0 && !hit.collider.GetComponent<ChessSquare>().isOccupied && !hit.collider.GetComponent<ChessSquare>().isThreatened)
                         {
                             InstantiateQueen(hit, chessSquareComponent);
                             MarkSquares(chessSquareComponent);
@@ -59,10 +45,10 @@ public class PlayerAction : MonoBehaviour
 
     public void InstantiateQueen(RaycastHit2D hit, ChessSquare chessSquareComponent)
     {
-        GameObject queen = Instantiate(ChessGameManager.queenPrefab, chessSquareComponent.gameObject.transform);
-        ChessGameManager.spawnedQueens.Add(queen);
-        ChessGameManager.queenCounter--;
-        queen.transform.SetParent(ChessGameManager.inGame.transform, false);
+        GameObject queen = Instantiate(ChessGameManager.MasterSingleton.queenPrefab, chessSquareComponent.gameObject.transform);
+        ChessGameManager.MasterSingleton.spawnedQueens.Add(queen);
+        ChessGameManager.MasterSingleton.queenCounter--;
+        queen.transform.SetParent(ChessGameManager.MasterSingleton.inGame.transform, false);
         queen.transform.SetParent(chessSquareComponent.gameObject.transform);
         queen.transform.localPosition = new(0, 0, -2);
         hit.collider.GetComponent<ChessSquare>().isOccupied = true;
@@ -72,7 +58,7 @@ public class PlayerAction : MonoBehaviour
     {
         int row = chessSquareComponent.row;
         int col = chessSquareComponent.col;
-        DisplaySquares.MarkThreatenedSquares(row, col);
-        DisplaySquares.HighlightThreatenedSquares(row, col);
+        ChessGameManager.MasterSingleton.DisplaySquares.MarkThreatenedSquares(row, col);
+        ChessGameManager.MasterSingleton.DisplaySquares.HighlightThreatenedSquares(row, col);
     }
 }

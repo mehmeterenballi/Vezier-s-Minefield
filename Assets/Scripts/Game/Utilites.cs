@@ -25,12 +25,12 @@ public class Utilites : MonoBehaviour
     public static void StartTimer()
     {
         // Kronometreyi baþlat
-        ChessGameManager.isRunning = true;
+        ChessGameManager.MasterSingleton.isRunning = true;
     }
 
     public static void StopTimer()
     {
         // Kronometreyi durdur
-        ChessGameManager.isRunning = false;
+        ChessGameManager.MasterSingleton.isRunning = false;
     }
 }

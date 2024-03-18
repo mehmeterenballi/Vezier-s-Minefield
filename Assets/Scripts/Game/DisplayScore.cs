@@ -14,11 +14,11 @@ public class DisplayScore : MonoBehaviour
     public static bool areScoresDisplayed = false;
     public static void ShowScore()
     {
-        if (ChessGameManager.queenCounter == 0)
+        if (ChessGameManager.MasterSingleton.queenCounter == 0)
         {
-            ChessGameManager.isWinner = true;
+            ChessGameManager.MasterSingleton.isWinner = true;
             Debug.Log("You Won");
-            currentScoreText.text = ChessGameManager.score + "!";
+            currentScoreText.text = ChessGameManager.MasterSingleton.score + "!";
             currentScoreText.gameObject.SetActive(true);
             if (CheckScore.isHighScore)
             {
@@ -27,8 +27,8 @@ public class DisplayScore : MonoBehaviour
         }
         else
         {
-            ChessGameManager.gameOver = true;
-            ChessGameManager.GameOver.SetActive(true);
+            ChessGameManager.MasterSingleton.gameOver = true;
+            ChessGameManager.MasterSingleton.GameOver.SetActive(true);
         }
 
         if (CheckScore.highscores.Count > 0)
@@ -43,9 +43,9 @@ public class DisplayScore : MonoBehaviour
             }
         }
 
-        ChessGameManager.inGame.SetActive(false);
+        ChessGameManager.MasterSingleton.inGame.SetActive(false);
         scores.SetActive(true);
-        ChessGameManager.solutions.SetActive(true);
+        ChessGameManager.MasterSingleton.solutions.SetActive(true);
         Utilites.StopTimer();
         areScoresDisplayed = true;
     }
