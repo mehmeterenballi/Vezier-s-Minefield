@@ -17,6 +17,9 @@ public class ChessGameManager : MonoBehaviour
     public CheckScore CheckScore { get; private set; }
     public DisplaySquares DisplaySquares { get; private set; }
     public PlayerAction PlayerAction { get; private set; }
+    public DisplayScore DisplayScore { get; private set; }
+    public Utilities Utilities { get; private set; }
+    public LocalizeGame LocalizeGame { get; private set; }
 
     private void Awake()
     {
@@ -31,6 +34,9 @@ public class ChessGameManager : MonoBehaviour
         CheckScore = GetComponentInChildren<CheckScore>();
         DisplaySquares = GetComponentInChildren<DisplaySquares>();
         PlayerAction = GetComponentInChildren<PlayerAction>();
+        DisplayScore = GetComponentInChildren<DisplayScore>();
+        Utilities = GetComponentInChildren<Utilities>();
+        LocalizeGame = GetComponentInChildren<LocalizeGame>();
     }
 
     public bool isWinner = false;
@@ -42,7 +48,6 @@ public class ChessGameManager : MonoBehaviour
     public GameObject solutions;
     public GameObject queenPrefab;
 
-    private Camera mainCamera;
     public GameObject inGame;
 
     // Define the chessboard dimensions
@@ -69,12 +74,10 @@ public class ChessGameManager : MonoBehaviour
 
     void Start()
     {
-        mainCamera = Camera.main;
-
-        Utilites.StartTimer();
+        MasterSingleton.Utilities.StartTimer();
 
         // Initialize the chessboardSquares array
-        DisplaySquares.InitializeChessboardSquares();
+        MasterSingleton.DisplaySquares.InitializeChessboardSquares();
     }
 
     void Update()
@@ -90,28 +93,28 @@ public class ChessGameManager : MonoBehaviour
         else
         {
             elapsedTime += Time.deltaTime;
-            timerText.text = "Time: " + Mathf.Round(elapsedTime);
+            MasterSingleton.timerText.text = "Time: " + Mathf.Round(elapsedTime);
             score = (int)Mathf.Round(elapsedTime);
 
-            if (DisplayScore.areScoresDisplayed) // Her çevrimde iþlenmesin diye
+            if (MasterSingleton.DisplayScore.areScoresDisplayed) // Her çevrimde iþlenmesin diye
             {
-                DisplayScore.HideScores();
+                MasterSingleton.DisplayScore.HideScores();
             }
 
             // Kullanýcý tahtaya týkladýðýnda çalýþýr
-            PlayerAction.TouchBoard(mainCamera);
+            MasterSingleton.PlayerAction.TouchBoard();
         }
     }
 
     private void GameEnded()
     {
-        if (!DisplayScore.areScoresDisplayed) // Her çevrimde iþlenmesin diye
+        if (!MasterSingleton.DisplayScore.areScoresDisplayed) // Her çevrimde iþlenmesin diye
         {
-            CheckScore.ManageScore(score);
-            DisplayScore.ShowScore();
+            MasterSingleton.CheckScore.ManageScore(score);
+            MasterSingleton.DisplayScore.ShowScore();
         }
-        replayButton.SetActive(true);
-        backButton.SetActive(true);
-        backArrowButton.SetActive(false);
+        MasterSingleton.replayButton.SetActive(true);
+        MasterSingleton.backButton.SetActive(true);
+        MasterSingleton.backArrowButton.SetActive(false);
     }
 }

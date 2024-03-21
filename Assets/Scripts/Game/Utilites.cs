@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class Utilites : MonoBehaviour
+public class Utilities : MonoBehaviour
 {
     public AudioSource audioSource;
 
@@ -22,13 +22,13 @@ public class Utilites : MonoBehaviour
         audioSource.volume = PlayerPrefs.GetFloat("audioVolume", 0.5f);
     }
 
-    public static void StartTimer()
+    public void StartTimer()
     {
         // Kronometreyi baþlat
         ChessGameManager.MasterSingleton.isRunning = true;
     }
 
-    public static void StopTimer()
+    public void StopTimer()
     {
         // Kronometreyi durdur
         ChessGameManager.MasterSingleton.isRunning = false;

@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
@@ -8,32 +7,9 @@ using UnityEngine;
 public class CheckScore : MonoBehaviour
 {
     private string[] highscoreStrings;
-    public static bool isHighScore = false;
-    public static List<int> highscores = new(5);
-    public static TextMeshProUGUI highScoresText;
-
-    //private void InsertAndShift(int[] array, int index, int value)
-    //{
-    //    for (int i = array.Length - 1; i > index; i--)
-    //    {
-    //        array[i] = array[i - 1];
-    //    }
-    //    array[index] = value;
-    //}
-
-    //public static CheckScore instance;
-    //private void Awake()
-    //{
-    //    if (instance == null)
-    //    {
-    //        instance = this;
-    //    }
-    //    else
-    //    {
-    //        Destroy(gameObject);
-    //    }
-    //    //DontDestroyOnLoad(gameObject);
-    //}
+    public bool isHighScore = false;
+    public List<int> highscores = new(5);
+    public TextMeshProUGUI highScoresText;
 
     public void ManageScore(int score)
     {
@@ -53,9 +29,15 @@ public class CheckScore : MonoBehaviour
             {
                 for (int i = 0; i < highscoreStrings.Length; i++)
                 {
+                    Debug.Log("highscoreStrings.Length: " + highscoreStrings.Length);
                     if (Int32.TryParse(highscoreStrings[i], out int currentScore))
                     {
-                        highscores[i] = currentScore;
+                        Debug.Log("highscores.Count: " + highscores.Count);
+                        highscores.Insert(i, currentScore);
+                        if (highscores.Count > highscoreStrings.Length)
+                        {
+                            highscores.RemoveAt(highscores.Count - 1);
+                        }
                         if (score == highscores[i])
                         {
                             isHighScore = true;
@@ -104,6 +86,10 @@ public class CheckScore : MonoBehaviour
                     }
                 }
             }
+        }
+        if (highscores.Count >= 5)
+        {
+            highscores.RemoveRange(4, highscores.Count - 4);
         }
     }
 

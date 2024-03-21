@@ -14,8 +14,8 @@ public class ResetPlayScene : MonoBehaviour
 
         ChessGameManager.MasterSingleton.inGame.SetActive(true);
         gameManager.currentScoreText.gameObject.SetActive(false);
-        DisplayScore.highscoreText.gameObject.SetActive(false);
-        DisplayScore.scores.SetActive(false);
+        ChessGameManager.MasterSingleton.DisplayScore.highscoreText.gameObject.SetActive(false);
+        ChessGameManager.MasterSingleton.DisplayScore.scores.SetActive(false);
         ChessGameManager.MasterSingleton.solutions.SetActive(false);
         ChessGameManager.MasterSingleton.GameOver.SetActive(false);
         gameManager.replayButton.SetActive(false);
@@ -39,7 +39,7 @@ public class ResetPlayScene : MonoBehaviour
 
         ChessGameManager.MasterSingleton.gameOver = false;
         ChessGameManager.MasterSingleton.isWinner = false;
-        DisplayScore.HideScores();
+        ChessGameManager.MasterSingleton.DisplayScore.HideScores();
     }
 }
  

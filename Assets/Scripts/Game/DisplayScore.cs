@@ -3,16 +3,13 @@ using UnityEngine;
 
 public class DisplayScore : MonoBehaviour
 {
-    public ChessGameManager gameManager;
+    public GameObject scores;
+    public TextMeshProUGUI highscoreText;
+    public TextMeshProUGUI currentScoreText;
+    public TextMeshProUGUI highScoresText;
 
-    public static TextMeshProUGUI highscoreText;
-    public static TextMeshProUGUI currentScoreText;
-    public static GameObject scores;
-
-    public static TextMeshProUGUI highScoresText;
-
-    public static bool areScoresDisplayed = false;
-    public static void ShowScore()
+    public bool areScoresDisplayed = false;
+    public void ShowScore()
     {
         if (ChessGameManager.MasterSingleton.queenCounter == 0)
         {
@@ -20,7 +17,7 @@ public class DisplayScore : MonoBehaviour
             Debug.Log("You Won");
             currentScoreText.text = ChessGameManager.MasterSingleton.score + "!";
             currentScoreText.gameObject.SetActive(true);
-            if (CheckScore.isHighScore)
+            if (ChessGameManager.MasterSingleton.CheckScore.isHighScore)
             {
                 highscoreText.gameObject.SetActive(true);
             }
@@ -31,14 +28,14 @@ public class DisplayScore : MonoBehaviour
             ChessGameManager.MasterSingleton.GameOver.SetActive(true);
         }
 
-        if (CheckScore.highscores.Count > 0)
+        if (ChessGameManager.MasterSingleton.CheckScore.highscores.Count > 0)
         {
-            CheckScore.highScoresText.text = "Best Score: " + CheckScore.highscores[0] + "\n";
-            if (CheckScore.highscores.Count != 1)
+            ChessGameManager.MasterSingleton.CheckScore.highScoresText.text = "Best Score: " + ChessGameManager.MasterSingleton.CheckScore.highscores[0] + "\n";
+            if (ChessGameManager.MasterSingleton.CheckScore.highscores.Count != 1)
             {
-                for (int i = 1; i < CheckScore.highscores.Count; i++)
+                for (int i = 1; i < ChessGameManager.MasterSingleton.CheckScore.highscores.Count; i++)
                 {
-                    CheckScore.highScoresText.text += (i + 1).ToString() + ": " + CheckScore.highscores[i] + "\n";
+                    ChessGameManager.MasterSingleton.CheckScore.highScoresText.text += (i + 1).ToString() + ": " + ChessGameManager.MasterSingleton.CheckScore.highscores[i] + "\n";
                 }
             }
         }
@@ -46,13 +43,13 @@ public class DisplayScore : MonoBehaviour
         ChessGameManager.MasterSingleton.inGame.SetActive(false);
         scores.SetActive(true);
         ChessGameManager.MasterSingleton.solutions.SetActive(true);
-        Utilites.StopTimer();
+        ChessGameManager.MasterSingleton.Utilities.StopTimer();
         areScoresDisplayed = true;
     }
 
-    public static void HideScores()
+    public void HideScores()
     {
-        Utilites.StartTimer();
+        ChessGameManager.MasterSingleton.Utilities.StartTimer();
         areScoresDisplayed = false;
     }
 }

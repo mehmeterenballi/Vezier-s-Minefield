@@ -5,7 +5,14 @@ using UnityEngine;
 
 public class PlayerAction : MonoBehaviour
 {
-    public void TouchBoard(Camera mainCamera)
+    private Camera mainCamera;
+
+    private void Start()
+    {
+        mainCamera = Camera.main;
+    }
+
+    public void TouchBoard()
     {
         // Check for touches
         if (Input.touchCount > 0)
