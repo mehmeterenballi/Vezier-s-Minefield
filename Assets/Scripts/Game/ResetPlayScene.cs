@@ -1,6 +1,3 @@
-using JetBrains.Annotations;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class ResetPlayScene : MonoBehaviour
@@ -10,34 +7,39 @@ public class ResetPlayScene : MonoBehaviour
     public void ResetGame()
     {
         // Oyunu sýfýrla
-        gameManager.queenCounter = 8;
-        gameManager.unThreatenedSquares = 64;
+        ChessGameManager.MasterSingleton.elapsedTime = 0f;
+        ChessGameManager.MasterSingleton.score = 0;
+        ChessGameManager.MasterSingleton.queenCounter = 8;
+        ChessGameManager.MasterSingleton.unThreatenedSquares = 64;
 
-        gameManager.inGame.SetActive(true);
+        ChessGameManager.MasterSingleton.inGame.SetActive(true);
         gameManager.currentScoreText.gameObject.SetActive(false);
-        gameManager.highscoreText.gameObject.SetActive(false);
-        gameManager.scores.SetActive(false);
-        gameManager.GameOver.SetActive(false);
-        gameManager.replayButton.gameObject.SetActive(false);
+        ChessGameManager.MasterSingleton.DisplayScore.highscoreText.gameObject.SetActive(false);
+        ChessGameManager.MasterSingleton.DisplayScore.scores.SetActive(false);
+        ChessGameManager.MasterSingleton.solutions.SetActive(false);
+        ChessGameManager.MasterSingleton.GameOver.SetActive(false);
+        gameManager.replayButton.SetActive(false);
 
-        for (int i = 0; i < gameManager.rows; i++)
+        for (int i = 0; i < ChessGameManager.MasterSingleton.rows; i++)
         {
-            for (int j = 0; j < gameManager.columns; j++)
+            for (int j = 0; j < ChessGameManager.MasterSingleton.columns; j++)
             {
-                gameManager.threatenedSquares[i, j] = false;
-                gameManager.chessboardSquares[i, j].transform.position = new(gameManager.chessboardSquares[i, j].transform.position.x,
-                        gameManager.chessboardSquares[i, j].transform.position.y, 90f);
+                ChessGameManager.MasterSingleton.threatenedSquares[i, j] = false;
+                DisplaySquares.chessboardSquares[i, j].GetComponent<ChessSquare>().isThreatened = false;
+                DisplaySquares.chessboardSquares[i, j].GetComponent<ChessSquare>().isOccupied = false;
+                DisplaySquares.chessboardSquares[i, j].transform.position = new(DisplaySquares.chessboardSquares[i, j].transform.position.x,
+                        DisplaySquares.chessboardSquares[i, j].transform.position.y, 90f);
             }
         }
 
-        foreach (GameObject queen in gameManager.spawnedQueens)
+        foreach (GameObject queen in ChessGameManager.MasterSingleton.spawnedQueens)
         {
             Destroy(queen);
         }
 
-        gameManager.gameOver = false;
-        gameManager.isWinner = false;
-        gameManager.StartTimer();
+        ChessGameManager.MasterSingleton.gameOver = false;
+        ChessGameManager.MasterSingleton.isWinner = false;
+        ChessGameManager.MasterSingleton.DisplayScore.HideScores();
     }
 }
  
