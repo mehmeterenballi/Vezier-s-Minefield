@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class DisplaySquares : MonoBehaviour
 {
+    private ChessGameManager MasterSingleton;
+
     // Array to store logical representation of the chessboard
     public static GameObject[,] chessboardSquares;
 
@@ -18,8 +20,9 @@ public class DisplaySquares : MonoBehaviour
     public static DisplaySquares instance;
     private void Awake()
     {
-        rows = ChessGameManager.MasterSingleton.rows;
-        columns = ChessGameManager.MasterSingleton.columns;
+        MasterSingleton = ChessGameManager.MasterSingleton;
+        rows = MasterSingleton.rows;
+        columns = MasterSingleton.columns;
     }
 
     public void InitializeChessboardSquares()
@@ -81,16 +84,16 @@ public class DisplaySquares : MonoBehaviour
                 chessboardSquares[i, col].GetComponent<ChessSquare>().isThreatened = true;
                 if (col == row && row == i)
                 {
-                    ChessGameManager.MasterSingleton.unThreatenedSquares--;
+                    MasterSingleton.unThreatenedSquares--;
                 }
                 else
                 {
-                    ChessGameManager.MasterSingleton.unThreatenedSquares -= 2;
+                    MasterSingleton.unThreatenedSquares -= 2;
                 }
             }
 
-            ChessGameManager.MasterSingleton.threatenedSquares[row, i] = true;
-            ChessGameManager.MasterSingleton.threatenedSquares[i, col] = true;
+            MasterSingleton.threatenedSquares[row, i] = true;
+            MasterSingleton.threatenedSquares[i, col] = true;
 
         }
 
@@ -103,8 +106,8 @@ public class DisplaySquares : MonoBehaviour
                     if (chessboardSquares[i, j].GetComponent<ChessSquare>().isThreatened == false)
                     {
                         chessboardSquares[i, j].GetComponent<ChessSquare>().isThreatened = true;
-                        ChessGameManager.MasterSingleton.threatenedSquares[i, j] = true;
-                        ChessGameManager.MasterSingleton.unThreatenedSquares--;
+                        MasterSingleton.threatenedSquares[i, j] = true;
+                        MasterSingleton.unThreatenedSquares--;
                     }
                 }
             }
@@ -118,7 +121,7 @@ public class DisplaySquares : MonoBehaviour
         {
             for (int j = 0; j < columns; j++)
             {
-                if (ChessGameManager.MasterSingleton.threatenedSquares[i, j] == true && chessboardSquares[i, j].GetComponent<ChessSquare>().isOccupied == false)
+                if (MasterSingleton.threatenedSquares[i, j] == true && chessboardSquares[i, j].GetComponent<ChessSquare>().isOccupied == false)
                 {
                     chessboardSquares[i, j].transform.position = new(chessboardSquares[i, j].transform.position.x,
                         chessboardSquares[i, j].transform.position.y, -2f);

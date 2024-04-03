@@ -5,7 +5,13 @@ using UnityEngine;
 
 public class PlayerAction : MonoBehaviour
 {
+    private ChessGameManager MasterSingleton;
     private Camera mainCamera;
+
+    private void Awake()
+    {
+        MasterSingleton = ChessGameManager.MasterSingleton;
+    }
 
     private void Start()
     {

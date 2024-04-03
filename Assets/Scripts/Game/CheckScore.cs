@@ -6,17 +6,23 @@ using UnityEngine;
 
 public class CheckScore : MonoBehaviour
 {
+    private ChessGameManager MasterSingleton;
     private string[] highscoreStrings;
     public bool isHighScore = false;
     public List<int> highscores = new(5);
     public TextMeshProUGUI highScoresText;
+
+    private void Awake()
+    {
+        MasterSingleton = ChessGameManager.MasterSingleton;
+    }
 
     public void ManageScore(int score)
     {
         highscoreStrings = PlayerPrefs.GetString("highscores", "").Split(",");
         isHighScore = false;
 
-        if (ChessGameManager.MasterSingleton.queenCounter == 0)
+        if (MasterSingleton.queenCounter == 0)
         {
             if (highscoreStrings[0] == "")
             {

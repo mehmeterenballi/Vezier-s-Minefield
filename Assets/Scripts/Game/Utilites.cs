@@ -5,7 +5,13 @@ using UnityEngine.SceneManagement;
 
 public class Utilities : MonoBehaviour
 {
+    private ChessGameManager MasterSingleton;
     public AudioSource audioSource;
+
+    private void Awake()
+    {
+        MasterSingleton = ChessGameManager.MasterSingleton;
+    }
 
     private void Start()
     {
@@ -25,12 +31,12 @@ public class Utilities : MonoBehaviour
     public void StartTimer()
     {
         // Kronometreyi baþlat
-        ChessGameManager.MasterSingleton.isRunning = true;
+        MasterSingleton.isRunning = true;
     }
 
     public void StopTimer()
     {
         // Kronometreyi durdur
-        ChessGameManager.MasterSingleton.isRunning = false;
+        MasterSingleton.isRunning = false;
     }
 }
